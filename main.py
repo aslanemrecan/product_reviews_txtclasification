@@ -55,9 +55,6 @@ valid_loader = DataLoader(tokenized_validation_dataset, batch_size=batch_size)
 #     exit()# Just to print the first batch and not iterate over the entire dataset
 # exit()
 
-# # Move model to device
-# device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-# model.to(device)
 
 # Check if GPUs are available and set the model to use them
 if torch.cuda.is_available():
@@ -103,10 +100,6 @@ print("******************Training started******************")
 for epoch in range(epochs):
     model.train()
     train_preds, train_labels, total_train_loss = [], [], 0
-    # total_loss, total_accuracy = 0, 0
-    # train_preds, train_labels = [], []
-    # Adding a tqdm progress bar
-    # progress_bar = tqdm(train_loader, desc=f"Epoch {epoch + 1}/{epochs}", leave=False, disable=False)
 
     for batch in tqdm(train_loader, desc=f"Epoch {epoch + 1}/{epochs} - Training"):
         optimizer.zero_grad()
@@ -138,19 +131,6 @@ for epoch in range(epochs):
                "train_recall": train_recall,
                "train_f1": train_f1}, commit=False)
 
-    #     total_loss += loss.item()
-    #     # Calculate training metrics
-    # train_accuracy = accuracy_score(train_labels, train_preds)
-    # train_precision = precision_score(train_labels, train_preds)
-    # train_recall = recall_score(train_labels, train_preds)
-    # train_f1 = f1_score(train_labels, train_preds)
-
-    # # Log training metrics to wandb
-    # wandb.log({"epoch": epoch, 
-    #            "train_accuracy": train_accuracy, 
-    #            "train_precision": train_precision,
-    #            "train_recall": train_recall,
-    #            "train_f1": train_f1}, commit=False)
         
     # Save a checkpoint at the end of each epoch
     torch.save({
@@ -167,9 +147,6 @@ for epoch in range(epochs):
     model.eval()
     val_preds, val_labels = [], []
     total_val_loss = 0
-
-    # # Add tqdm progress bar for validation loop
-    # val_progress_bar = tqdm(valid_loader, desc="Validating", leave=False, disable=False)
     
     for batch in tqdm(valid_loader, desc="Validating", leave=False, disable=False):
         input_ids = batch['input_ids'].to(device)
@@ -192,27 +169,5 @@ for epoch in range(epochs):
                "val_precision": val_precision, 
                "val_recall": val_recall,
                "val_f1": val_f1}, commit=True)
-        # logits = outputs.logits
-        # predictions = torch.argmax(logits, dim=1).flatten()
-
-        # # Collect all predictions and true labels
-        # all_predictions.extend(predictions.cpu().numpy())
-        # all_labels.extend(labels.cpu().numpy())
-    
-    # # Calculate metrics
-    # precision = precision_score(all_labels, all_predictions, average='binary')
-    # recall = recall_score(all_labels, all_predictions, average='binary')
-    # f1 = f1_score(all_labels, all_predictions, average='binary')
-
-    # print(f"Validation Precision: {precision}")
-    # print(f"Validation Recall: {recall}")
-    # print(f"Validation F1 Score: {f1}")
-
-    # # Log metrics to wandb
-    # wandb.log({"validation_precision": precision, "validation_recall": recall, "validation_f1": f1})    
-
-    # average_val_accuracy = total_eval_accuracy / len(valid_loader)
-    # print(f"Validation Accuracy: {average_val_accuracy}")
-    # wandb.log({"validation_accuracy": average_val_accuracy})
-# Finish the run
+        
 wandb.finish()
